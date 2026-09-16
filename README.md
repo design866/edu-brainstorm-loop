@@ -1,5 +1,7 @@
 # 🧑‍🏫 edu-brainstorm-loop · 教育头脑风暴闭环（5 专家机器人协作）
 
+![edu-brainstorm-loop-cover](docs/edu-brainstorm-loop-cover.png)
+
 小学教育课题/教学设计的**多机器人头脑风暴工作流**：5 位 AI 教育专家按「小组发散 → 全师评审 → 迭代深化 → 终审把关」闭环协作，产出有理论根基、可落地的创意方案。
 
 ## ✨ 特性

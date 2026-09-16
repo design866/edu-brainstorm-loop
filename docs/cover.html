@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:640px; font-family:"Segoe UI","Microsoft YaHei",sans-serif;
+         background:radial-gradient(1200px 600px at 85% -10%, #1d3a5f 0%, transparent 55%),
+                    radial-gradient(900px 500px at -10% 110%, #3a1d5f 0%, transparent 50%),
+                    linear-gradient(135deg,#0f1115 0%,#171a21 60%,#1e222b 100%);
+         color:#e8eaed; overflow:hidden; position:relative; }
+  .grid { position:absolute; inset:0; opacity:.05;
+          background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);
+          background-size:48px 48px; }
+  .content { position:relative; padding:56px 64px; height:100%; display:flex; flex-direction:column; }
+  .badge { display:inline-flex; align-items:center; gap:8px; align-self:flex-start;
+           background:#1d3a5f; border:1px solid #4da3ff; border-radius:999px;
+           padding:8px 18px; font-size:16px; color:#fff; letter-spacing:.5px; }
+  .badge .dot { width:9px; height:9px; border-radius:50%; background:#34d399; box-shadow:0 0 10px #34d399; }
+  h1 { font-size:58px; font-weight:800; margin-top:28px; line-height:1.15; }
+  h1 .grad { background:linear-gradient(90deg,#4da3ff,#7c5cff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .sub { font-size:22px; color:#98a2b3; margin-top:14px; max-width:900px; line-height:1.5; }
+  .bots { display:flex; gap:16px; margin-top:40px; }
+  .bot { background:rgba(29,58,95,.55); border:1px solid #2a2f3a; border-radius:14px;
+         padding:16px 20px; display:flex; align-items:center; gap:14px; min-width:200px; }
+  .bot .emoji { font-size:34px; }
+  .bot .role { font-size:16px; font-weight:700; color:#fff; }
+  .bot .name { font-size:13px; color:#98a2b3; margin-top:3px; }
+  .flow { display:flex; align-items:center; gap:10px; margin-top:30px; }
+  .step { background:#1d3a5f; border:1px solid #4da3ff; border-radius:10px;
+          padding:10px 16px; font-size:15px; color:#c7d7ee; font-weight:600; }
+  .arrow { color:#4da3ff; font-size:20px; }
+  .footer { margin-top:auto; display:flex; justify-content:space-between; align-items:center; }
+  .ver { background:rgba(52,211,153,.12); border:1px solid rgba(52,211,153,.4); color:#34d399;
+         border-radius:8px; padding:6px 14px; font-size:14px; font-weight:700; }
+  .tag { font-size:15px; color:#8b93a3; }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="content">
+    <div class="badge"><span class="dot"></span> AI 教育多智能体协作 · Hermes Bots</div>
+    <h1>教育头脑风暴闭环<br><span class="grad">5 位 AI 教育专家 · 多轮协作</span></h1>
+    <div class="sub">小学课题规划 · 教学设计 · 题型创意 · 可行性评审 · 终审把关</div>
+    <div class="bots">
+      <div class="bot"><div class="emoji">💡</div><div><div class="role">点子哥</div><div class="name">创意发散</div></div></div>
+      <div class="bot"><div class="emoji">🎓</div><div><div class="role">苏博士</div><div class="name">教育学·题型</div></div></div>
+      <div class="bot"><div class="emoji">🧭</div><div><div class="role">蔡老师</div><div class="name">课题规划</div></div></div>
+      <div class="bot"><div class="emoji">🎨</div><div><div class="role">李老师</div><div class="name">教学设计</div></div></div>
+      <div class="bot"><div class="emoji">🔍</div><div><div class="role">吴老师</div><div class="name">终审把关</div></div></div>
+    </div>
+    <div class="flow">
+      <div class="step">小组发散</div><div class="arrow">→</div>
+      <div class="step">全师评审</div><div class="arrow">→</div>
+      <div class="step">迭代深化</div><div class="arrow">→</div>
+      <div class="step">终审裁决</div>
+    </div>
+    <div class="footer">
+      <div class="ver">v1.0.0 · MIT License</div>
+      <div class="tag">github.com/design866/edu-brainstorm-loop</div>
+    </div>
+  </div>
+</body>
+</html>
