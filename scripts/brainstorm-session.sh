@@ -17,13 +17,28 @@ hermes -p edu-pedagogy chat --in "$HOME_DIR" -c "Bot Chat" --create-if-missing -
 echo "=== [轮1] 创意池汇合 ==="
 echo "(点子哥发散 + 苏博士理论创意 = 创意池，进入全师评审)"
 
-echo "=== [轮2] 三位专家并行评审 ==="
+echo "=== [轮2] 三位专家并行评审（附创意池） ==="
+# 把轮0 输出拼成创意池摘要传给评审（修复：评审老师拿不到创意池的问题）
+POOL_SUMMARY=$(python -c "
+import io, re
+w = r'%LOCALAPPDATA%\\Temp\\brainstorm'
+txt = ''
+for f in ['round0-brains.txt','round0-pedagogy.txt']:
+    try: txt += io.open(w+'\\'+f, encoding='utf-8', errors='replace').read()
+    except: pass
+# 抽要点行：含数字序号/创新点/题目名
+lines = [l.strip() for l in txt.splitlines() if l.strip() and len(l.strip()) < 120]
+keep = [l for l in lines if re.search(r'[①-⑩①②③④⑤⑥⑦⑧⑨⑩苏-|^\*\*|^\d+[\.、]', l)]
+print(' | '.join(keep[:30])[:1800])
+" 2>/dev/null)
+POOL_SUMMARY="${POOL_SUMMARY:-点子哥发散10点子+苏博士理论创意9条（详见两人Bot Chat）}"
+
 hermes -p edu-planner chat --in "$HOME_DIR" -c "Bot Chat" --create-if-missing -Q -q \
-  "评审轮（可行性）：点子哥和苏博士对《$TOPIC》产出创意池（直觉创意+教育学理论创意+题型创意），请逐条评估可行性（课标/课时/资源/学生适合度），给出 ✅可行/⚠️有条件/❌不可行 结论和理由。" 2>&1 | tail -40 > "$W/round2-planner.txt" &
+  "评审轮（可行性）：主题《$TOPIC》。创意池：$POOL_SUMMARY 。请逐条评估可行性（课标/课时/资源/学生适合度），给出 ✅可行/⚠️有条件/❌不可行 结论和理由。" 2>&1 | tail -40 > "$W/round2-planner.txt" &
 hermes -p edu-designer chat --in "$HOME_DIR" -c "Bot Chat" --create-if-missing -Q -q \
-  "评审轮（课堂落地）：点子哥和苏博士对《$TOPIC》产出创意池（直觉创意+教育学理论创意+题型创意），请评估课堂落地性（活动适合度/课件交互/老师能否直接上），给出改进建议。" 2>&1 | tail -40 > "$W/round2-designer.txt" &
+  "评审轮（课堂落地）：主题《$TOPIC》。创意池：$POOL_SUMMARY 。请评估课堂落地性（活动适合度/课件交互/老师能否直接上），给出改进建议。" 2>&1 | tail -40 > "$W/round2-designer.txt" &
 hermes -p edu-reviewer chat --in "$HOME_DIR" -c "Bot Chat" --create-if-missing -Q -q \
-  "评审轮（质量把关）：点子哥和苏博士对《$TOPIC》产出创意池，请评估创新性/教育价值/可检测性，指出最弱和最值得保留的点子。" 2>&1 | tail -40 > "$W/round2-reviewer.txt" &
+  "评审轮（质量把关）：主题《$TOPIC》。创意池：$POOL_SUMMARY 。请评估创新性/教育价值/可检测性，指出最弱和最值得保留的点子。" 2>&1 | tail -40 > "$W/round2-reviewer.txt" &
 wait
 
 echo "=== [轮3] 创意小组基于反馈迭代 ==="
@@ -32,8 +47,19 @@ hermes -p edu-brains chat --in "$HOME_DIR" -c "Bot Chat" --create-if-missing -Q 
 hermes -p edu-pedagogy chat --in "$HOME_DIR" -c "Bot Chat" --create-if-missing -Q -q \
   "迭代轮：三位老师评审了创意池。请你从教育学角度补充深化：确保最终 2-3 个方案有理论根基、题型设计到位（变式/开放/情境），输出你的深化补充。" 2>&1 | tail -40 > "$W/round3-pedagogy.txt"
 
-echo "=== [轮4] 吴老师总把关 ==="
+echo "=== [轮4] 吴老师总把关（附最终方案） ==="
+FINAL_SUMMARY=$(python -c "
+import io
+w = r'%LOCALAPPDATA%\\Temp\\brainstorm'
+txt = ''
+for f in ['round3-brains.txt','round3-pedagogy.txt']:
+    try: txt += io.open(w+'\\'+f, encoding='utf-8', errors='replace').read()
+    except: pass
+print(txt[:1800].replace(chr(10),' '))
+" 2>/dev/null)
+FINAL_SUMMARY="${FINAL_SUMMARY:-创意小组已迭代出最终方案（详见两人Bot Chat）}"
+
 hermes -p edu-reviewer chat --in "$HOME_DIR" -c "Bot Chat" --create-if-missing -Q -q \
-  "终审轮：创意小组已根据三位专家反馈迭代出最终方案（含教育学理论支撑）。请做总把关：综合可行性/落地性/创新性/理论根基给出最终裁决（✅通过/⚠️有条件通过+条件/❌打回+原因），并给出实施顺序建议。" 2>&1 | tail -40 > "$W/round4-final.txt"
+  "终审轮：主题《$TOPIC》。最终方案：$FINAL_SUMMARY 。请做总把关：综合可行性/落地性/创新性/理论根基给出最终裁决（✅通过/⚠️有条件通过+条件/❌打回+原因），并给出实施顺序建议。" 2>&1 | tail -40 > "$W/round4-final.txt"
 
 echo "=== 头脑风暴闭环完成（5 机器人） ==="
