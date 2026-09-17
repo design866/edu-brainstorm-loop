@@ -18,6 +18,8 @@
 
 ## 🚀 安装（Hermes 用户）
 
+> ⚠️ **前置依赖**：安装后需 ①建立 5 个专家机器人 ②安装 OpenMAIC 平台，本流程才能运行和交付。
+
 ```bash
 # 1. 创建 5 个专家机器人（Hermes profile）
 hermes profile create edu-brains    --clone --description "小学教育头脑风暴主持人点子哥"
@@ -29,6 +31,8 @@ hermes profile create edu-reviewer  --clone --description "小学课堂诊断专
 # 2. 将 profiles/*-SOUL.md 复制到对应 profile 的 SOUL.md
 # 3. 将 SKILL.md 放入 Hermes skills 目录（如 ai/edu/edu-brainstorm-loop/）
 # 4. 将 scripts/brainstorm-session.sh 放入技能目录
+# 5. 安装 OpenMAIC（互动课堂平台，负责最终交付与语音）：
+#    git clone https://github.com/THU-MAIC/OpenMAIC && cd OpenMAIC && pnpm install && pnpm dev
 ```
 
 ## 📖 用法
