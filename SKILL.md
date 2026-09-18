@@ -16,13 +16,23 @@ platforms: [windows]
 - "规划 XX 课题 / 设计 XX 课 / 评 XX 教案" → 触发
 - "XX 活动的创意 / 题型设计 / 评价方案" → 触发
 
-## 前置依赖（发布版必须提示用户）
+## 前置依赖（一键自动安装）
 
-本流程依赖两项基础设施，**安装技能后必须明确提示**：
-1. **5 个专家机器人**（Hermes Bots profiles）：edu-brains / edu-pedagogy / edu-planner / edu-designer / edu-reviewer（各自 SOUL 见 `profiles/*-SOUL.md`，用 `hermes profile create` 创建后写入 SOUL）
-2. **OpenMAIC**（互动课堂平台，`C:\Users\Gilbert\OpenMAIC`，端口 3000）——负责最终交付与语音
+本流程依赖 5 个专家机器人 + OpenMAIC，**安装技能后运行一键脚本自动完成全部依赖**（无需手动）：
 
-> 提示话术：下载/安装本技能后，需先建立 5 个专家机器人和安装 OpenMAIC 平台，本流程才能运行和交付。
+```bash
+bash scripts/setup.sh
+```
+
+setup.sh 自动完成：
+1. **创建 5 个专家机器人**（edu-brains / edu-pedagogy / edu-planner / edu-designer / edu-reviewer，`hermes profile create --clone`，已存在则跳过）
+2. **写入角色 SOUL**（从 `profiles/*-SOUL.md` 复制到对应 profile）
+3. **配置模型**（继承火山方舟 Agent Plan / 可用 provider）
+4. **安装 OpenMAIC**（未安装则 git clone THU-MAIC/OpenMAIC + pnpm install + 注入 ARK key 到 .env.local）
+5. **启动 OpenMAIC**（localhost:3000，30-60 秒就绪）
+
+> 若机器已具备依赖，setup.sh 自动跳过（幂等）。依赖不足时（如无火山方舟 key），setup.sh 会用 opencode-free 免费模型兜底。
+> 手动步骤（等价于 setup.sh）：`hermes profile create` ×5 + 写 SOUL + 装/启 OpenMAIC。
 
 ## 参与机器人（Hermes Bots profiles）
 
@@ -57,7 +67,18 @@ platforms: [windows]
      · 默认：交给 OpenMAIC 生成课堂/课程并交付（含 TTS 语音）
      · 用户指定格式：按指定格式输出交付（HTML/教案/PPT/文档…）
      · OK 后再进入下一个教育问题
+     ↓
+⑦ 交付质检环（用户 2026-09 新增）── 用户点「确定定稿」后：
+     · OpenMAIC 生成课堂（异步 jobId 轮询）
+     · 生成完成 → 读取课堂内容 → **机器人质检**：
+         🔍 吴老师 质量总检（终审标准/教学评一致）
+         🎨 李老师 课堂落地检（活动/交互/课件）
+         🧭 蔡老师 内容要求检（定稿/课标）
+     · 质检报告：✅合格→交付 | ⚠️需修正→列问题→反馈 OpenMAIC 重做→再质检 | ❌→打回
+     · 编排脚本：`deliver-quality.sh "<定稿要求>"`（OpenMAIC 生成→读课堂→机器人质检→报告）
 ```
+
+**交付质检**：OpenMAIC 制作过程中，机器人持续监控内容是否符合要求与交付质量，合格才交付（用户硬性要求，2026-09）。
 
 ## 语音约束（重要）
 
@@ -68,7 +89,7 @@ platforms: [windows]
 
 ## 可视化输出规范
 
-讨论结果必须**可视化**，不能只给文字纪要：
+讨论结果必须**可视化**，不能只给文字纪要。**闭环一完成就自动运行 gen-panel.py 生成面板并弹出新标签页**：
 - 输出为单文件 HTML 可视化面板（可交互），包含：
   - ① 创意池卡片（来源标签：点子哥/苏博士/联合）
   - ② 三位老师评审意见（分栏/评分）
@@ -86,6 +107,14 @@ platforms: [windows]
 ```bash
 bash brainstorm-session.sh "<教育问题>"
 ```
+
+**每次闭环讨论完成，必须自动运行面板生成器并弹出可视化方案面板**（用户硬性要求）：
+
+```bash
+C:/Python314/python "<技能目录>/gen-panel.py" "<教育问题>"
+```
+
+`gen-panel.py` 自动读取 `%LOCALAPPDATA%\Temp\brainstorm\round*.txt` → 生成可视化 HTML 方案面板（5 机器人消息流 + 修改对话框）→ 在浏览器新标签页打开。生成器已随技能发布（scripts/gen-panel.py），安装后即可复用。
 
 ## 模型配额陷阱（2026-09 实测）
 

@@ -18,9 +18,13 @@
 
 ## 🚀 安装（Hermes 用户）
 
-> ⚠️ **前置依赖**：安装后需 ①建立 5 个专家机器人 ②安装 OpenMAIC 平台，本流程才能运行和交付。
+> ⚡ **一键安装**：安装后运行 `bash scripts/setup.sh`，**自动创建 5 个专家机器人 + 安装 OpenMAIC + 配置模型**，全程无需手动。
 
 ```bash
+# 0. 一键安装全部依赖（5 机器人 + OpenMAIC + 模型）——推荐
+bash scripts/setup.sh
+
+# 或手动分步：
 # 1. 创建 5 个专家机器人（Hermes profile）
 hermes profile create edu-brains    --clone --description "小学教育头脑风暴主持人点子哥"
 hermes profile create edu-pedagogy  --clone --description "教育学博士苏博士：教育理论+题型创意"
