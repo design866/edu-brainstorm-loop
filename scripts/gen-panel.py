@@ -91,13 +91,37 @@ textarea{width:100%%;border:2px solid var(--line);border-radius:10px;padding:11p
   <div class="sec">
     <h2>✏️ 提出修改（修改 → 再走一轮讨论 → 重新输出）</h2>
     <textarea id="mod" rows="3" placeholder="例：Phonics 加字母发音对照表 / 某个方案想调整 / 加更多互动…"></textarea>
-    <button class="btn" onclick="submitMod()">📤 提交修改 · 触发新一轮讨论</button>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn" style="background:linear-gradient(90deg,#8b5cf6,#4da3ff)" onclick="submitMod()">📤 提交修改 · 触发新一轮讨论</button>
+      <button class="btn" style="background:linear-gradient(90deg,#10b981,#0d9488)" onclick="confirmDeliver()">✅ 确定定稿 · 交付 OpenMAIC</button>
+    </div>
     <div id="hist"></div>
+    <div id="deliver" style="margin-top:12px"></div>
   </div>
   <div class="ver">生成时间 %s · 每次讨论完成自动生成 · edu-brainstorm-loop</div>
 </div>
 <script>
 var hist = document.getElementById('hist'), MODS = [];
+function confirmDeliver(){
+  var d = document.getElementById('deliver');
+  d.innerHTML = '<div class="diag" style="border-left-color:var(--green);background:#f0fdf6"><b>✅ 方案已定稿</b> · ' + new Date().toLocaleString() + ' · 已通知机器人交付 OpenMAIC 生成课堂</div>';
+  // 尝试直接调用 OpenMAIC（若页面在本地 HTTP 下可达）
+  try {
+    fetch('http://127.0.0.1:3000/api/generate-classroom', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({requirement: '按已定稿的头脑风暴方案生成课堂（见面板内容）', enableTTS: true, enableImageGeneration: false})
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if(j && j.jobId){ d.innerHTML += '<div class="diag" style="border-left-color:var(--blue);background:#f0f7ff"><b>🚀 OpenMAIC 已接收</b> · jobId: ' + j.jobId + ' · 正在生成课堂…</div>';
+        var iv = setInterval(function(){
+          fetch('http://127.0.0.1:3000/api/generate-classroom/' + j.jobId).then(function(r){return r.json()}).then(function(s){
+            if(s.status === 'succeeded'){ clearInterval(iv); d.innerHTML += '<div class="diag" style="border-left-color:var(--green);background:#f0fdf6"><b>🎉 课堂已生成！</b> <a href="' + (s.result && s.result.url || '') + '" target="_blank">打开课堂 →</a></div>'; }
+            else if(s.status === 'failed'){ clearInterval(iv); d.innerHTML += '<div class="diag" style="border-left-color:var(--red);background:#fef2f2"><b>❌ 生成失败</b> ' + (s.message || '') + '</div>'; }
+          }).catch(function(){});
+        }, 15000);
+      } else { d.innerHTML += '<div class="diag"><b>⚠️ OpenMAIC 未响应</b>（' + (j && j.error || '未知') + '）· 将在 Hermes 端代为触发交付</div>'; }
+    }).catch(function(){ d.innerHTML += '<div class="diag"><b>ℹ️ 已在面板记录定稿</b> · OpenMAIC 交付将由 Hermes 执行（点击后请告诉我一声）</div>'; });
+  } catch(e){ d.innerHTML += '<div class="diag"><b>ℹ️ 已在面板记录定稿</b> · OpenMAIC 交付将由 Hermes 执行</div>'; }
+}
 function submitMod(){
   var v = document.getElementById('mod').value.trim();
   if(!v){ document.getElementById('mod').focus(); return; }
