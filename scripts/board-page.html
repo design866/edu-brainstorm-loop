@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="refresh" content="4">
+<title>🤖 头脑风暴 · 实时消息台</title><style>
+:root{--bg:#0f1115;--card:#171a21;--card2:#1e222b;--line:#2a2f3a;--text:#e8eaed;--mut:#98a2b3;--ok:#34d399;--run:#f59e0b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI","Microsoft YaHei",sans-serif;padding:18px}
+h1{font-size:19px;margin-bottom:4px}
+.sub{font-size:12px;color:var(--mut);margin-bottom:16px}
+.bot{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.bot-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--line)}
+.bot-head .em{font-size:30px}
+.bot-head .nm{font-weight:800;font-size:15px}
+.bot-head .rl{font-size:11.5px;color:var(--mut)}
+.bot-head .st{margin-left:auto;font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px}
+.st.done{background:rgba(52,211,153,.15);color:var(--ok)}
+.st.run{background:rgba(245,158,11,.18);color:var(--run);animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.st.wait{background:rgba(74,85,104,.2);color:var(--mut)}
+.msgs{padding:10px 14px}
+.msg{border-left:3px solid var(--line);padding:8px 12px;margin:8px 0;background:var(--card2);border-radius:0 10px 10px 0}
+.msg .rt{font-size:10.5px;color:var(--run);font-weight:700;letter-spacing:.5px}
+.msg .tx{font-size:12.5px;color:#c9d4e2;white-space:pre-wrap;line-height:1.55;margin-top:4px;max-height:260px;overflow-y:auto}
+.empty{color:var(--mut);font-size:12px;padding:6px 2px}
+</style></head><body>
+<h1>🤖 教育头脑风暴 · 实时消息台</h1>
+<div class="sub">每个机器人一条消息一块 · 每 4 秒自动刷新</div>
+<div id="list"></div>
+<script>
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+fetch('/api').then(r=>r.json()).then(d=>{
+  var list=document.getElementById('list'); list.innerHTML='';
+  d.bots.forEach(b=>{
+    var stc=b.done?'done':b.working?'run':'wait';
+    var stt=b.done?'✓ 全部完成':b.working?'⚡ 工作中…':'待命';
+    var html='<div class="bot"><div class="bot-head"><span class="em">'+b.em+'</span>'+
+      '<div><div class="nm">'+b.name+'</div><div class="rl">'+b.role+'</div></div>'+
+      '<span class="st '+stc+'">'+stt+'</span></div><div class="msgs">';
+    if(!b.msgs.length) html+='<div class="empty">⏳ 等待任务…</div>';
+    b.msgs.forEach(m=>{ html+='<div class="msg"><div class="rt">'+m.round+'</div><div class="tx">'+esc(m.text)+'</div></div>'; });
+    html+='</div></div>'; list.innerHTML+=html;
+  });
+}).catch(e=>{document.getElementById('list').innerHTML='<div>加载失败: '+e+'</div>'});
+</script></body></html>

@@ -104,23 +104,23 @@ textarea{width:100%%;border:2px solid var(--line);border-radius:10px;padding:11p
 var hist = document.getElementById('hist'), MODS = [];
 function confirmDeliver(){
   var d = document.getElementById('deliver');
-  d.innerHTML = '<div class="diag" style="border-left-color:var(--green);background:#f0fdf6"><b>✅ 方案已定稿</b> · ' + new Date().toLocaleString() + ' · 已通知机器人交付 OpenMAIC 生成课堂</div>';
-  // 尝试直接调用 OpenMAIC（若页面在本地 HTTP 下可达）
+  d.innerHTML = '<div class="diag" style="border-left-color:var(--green);background:#f0fdf6"><b>✅ 方案已定稿</b> · ' + new Date().toLocaleString() + '</div>';
+  // ① 直达吴老师（edu-reviewer）：POST 桥接服务 → 立即派活
   try {
-    fetch('http://127.0.0.1:3000/api/generate-classroom', {
+    fetch('http://127.0.0.1:8790/confirm', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({requirement: '按已定稿的头脑风暴方案生成课堂（见面板内容）', enableTTS: true, enableImageGeneration: false})
+      body: JSON.stringify({requirement: '二年级英语互动课堂定稿方案：Phonics→句子→小故事，含跟读开麦，按质检修正点执行'})
     }).then(function(r){ return r.json(); }).then(function(j){
-      if(j && j.jobId){ d.innerHTML += '<div class="diag" style="border-left-color:var(--blue);background:#f0f7ff"><b>🚀 OpenMAIC 已接收</b> · jobId: ' + j.jobId + ' · 正在生成课堂…</div>';
-        var iv = setInterval(function(){
-          fetch('http://127.0.0.1:3000/api/generate-classroom/' + j.jobId).then(function(r){return r.json()}).then(function(s){
-            if(s.status === 'succeeded'){ clearInterval(iv); d.innerHTML += '<div class="diag" style="border-left-color:var(--green);background:#f0fdf6"><b>🎉 课堂已生成！</b> <a href="' + (s.result && s.result.url || '') + '" target="_blank">打开课堂 →</a></div>'; }
-            else if(s.status === 'failed'){ clearInterval(iv); d.innerHTML += '<div class="diag" style="border-left-color:var(--red);background:#fef2f2"><b>❌ 生成失败</b> ' + (s.message || '') + '</div>'; }
-          }).catch(function(){});
-        }, 15000);
-      } else { d.innerHTML += '<div class="diag"><b>⚠️ OpenMAIC 未响应</b>（' + (j && j.error || '未知') + '）· 将在 Hermes 端代为触发交付</div>'; }
-    }).catch(function(){ d.innerHTML += '<div class="diag"><b>ℹ️ 已在面板记录定稿</b> · OpenMAIC 交付将由 Hermes 执行（点击后请告诉我一声）</div>'; });
-  } catch(e){ d.innerHTML += '<div class="diag"><b>ℹ️ 已在面板记录定稿</b> · OpenMAIC 交付将由 Hermes 执行</div>'; }
+      if(j && j.ok){
+        d.innerHTML += '<div class="diag" style="border-left-color:var(--blue);background:#f0f7ff"><b>🔍 已通知吴老师立即开工</b> · ' + (j.message || '') + ' · ' + (j.job && j.job.time || '') + '</div>';
+        d.innerHTML += '<div class="diag" style="border-left-color:var(--amber);background:#fffbeb">⏳ 吴老师正在执行（生成/修复课堂→自检→联调脚本）… 可在工作台 http://127.0.0.1:8790 实时查看</div>';
+      } else {
+        d.innerHTML += '<div class="diag"><b>⚠️ 桥接未响应</b>（' + (j && j.message || '未知') + '）</div>';
+      }
+    }).catch(function(){
+      d.innerHTML += '<div class="diag" style="border-left-color:var(--red);background:#fef2f2"><b>⚠️ 无法直达吴老师</b>（桥接服务 8790 未运行）· 请让 Hermes 启动桥接后重试</div>';
+    });
+  } catch(e){ d.innerHTML += '<div class="diag">异常: ' + e + '</div>'; }
 }
 function submitMod(){
   var v = document.getElementById('mod').value.trim();
@@ -129,8 +129,19 @@ function submitMod(){
   document.getElementById('mod').value = '';
   var h = '<div class="note" style="text-align:left;margin-top:10px"><b>📝 修改历史（' + MODS.length + ' 条）</b></div>';
   MODS.forEach(function(m, i){ h += '<div class="diag">#' + (i+1) + ' ' + m + '</div>'; });
-  h += '<div class="note">⏳ 新一轮讨论已记录，将触发 5 专家迭代 + 复审 → 面板更新</div>';
+  h += '<div class="note" id="reviseNote">⏳ 正在通知点子哥+苏博士…</div>';
   hist.innerHTML = h;
+  try {
+    fetch('http://127.0.0.1:8790/revise', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({mod: v})
+    }).then(function(r){ return r.json(); }).then(function(j){
+      var n = document.getElementById('reviseNote');
+      if(j && j.ok){ n.textContent = '✅ ' + (j.message || '已通知') + ' · ' + (j.job && j.job.time || ''); n.style.color = '#0b8a5a'; }
+      else { n.textContent = '⚠️ 桥接未响应: ' + (j && j.message || '未知'); n.style.color = '#b36a05'; }
+    }).catch(function(){ var n=document.getElementById('reviseNote');
+      n.textContent = '⚠️ 桥接服务(8790)未运行，无法直达机器人'; n.style.color = '#d63a5f'; });
+  } catch(e){}
 }
 </script></body></html>''' % (esc(TOPIC), '\n'.join(cards), now)
 
