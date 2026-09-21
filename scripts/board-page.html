@@ -23,11 +23,24 @@ h1{font-size:19px;margin-bottom:4px}
 .empty{color:var(--mut);font-size:12px;padding:6px 2px}
 </style></head><body>
 <h1>🤖 教育头脑风暴 · 实时消息台</h1>
-<div class="sub">每个机器人一条消息一块 · 每 4 秒自动刷新</div>
+<div class="sub">每个机器人一条消息一块 · 每 4 秒自动刷新 · 方案产出实时显示</div>
+<div class="bot" style="border-color:#4da3ff">
+  <div class="bot-head"><span class="em">📄</span><div><div class="nm">产出文件（机器人写入的真实方案）</div><div class="rl">hermes-dm 目录 · 最新优先</div></div></div>
+  <div class="msgs" id="dmList"><div class="empty">加载中…</div></div>
+</div>
 <div id="list"></div>
 <script>
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 fetch('/api').then(r=>r.json()).then(d=>{
+  // 产出文件区
+  var dm=document.getElementById('dmList');
+  if(d.dm && d.dm.length){
+    dm.innerHTML='';
+    d.dm.forEach(f=>{
+      dm.innerHTML+='<div class="msg" style="border-left-color:#4da3ff"><div class="rt" style="color:#4da3ff">'+f.mtime+' · '+(f.size/1024).toFixed(1)+'KB</div><div class="tx" style="color:#7fc4ff;max-height:none;font-weight:700">📄 '+f.name+'</div></div>';
+    });
+  } else dm.innerHTML='<div class="empty">暂无产出文件（机器人完成后写入这里）</div>';
+  // 机器人消息
   var list=document.getElementById('list'); list.innerHTML='';
   d.bots.forEach(b=>{
     var stc=b.done?'done':b.working?'run':'wait';

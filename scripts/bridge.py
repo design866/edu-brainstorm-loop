@@ -36,6 +36,20 @@ def readf(f):
     lines = [l for l in t.splitlines() if l.strip()]
     return '\n'.join(lines)[:1400] if lines else None
 
+DM_DIR = os.path.expandvars(r'%LOCALAPPDATA%\Temp\hermes-dm')
+
+def dm_files():
+    """扫描 hermes-dm 最新产出文件（机器人写入的真实方案）"""
+    files = []
+    if os.path.isdir(DM_DIR):
+        for f in os.listdir(DM_DIR):
+            if f.lower().endswith(('.md', '.txt', '.json')):
+                fp = os.path.join(DM_DIR, f)
+                files.append({'name': f, 'size': os.path.getsize(fp),
+                              'mtime': datetime.datetime.fromtimestamp(os.path.getmtime(fp)).strftime('%m-%d %H:%M')})
+    files.sort(key=lambda x: x['mtime'], reverse=True)
+    return files[:8]
+
 def status():
     bots = []
     for prof, em, name, role, rounds in BOTS:
@@ -47,7 +61,7 @@ def status():
         total = len(rounds)
         bots.append({'em': em, 'name': name, 'role': role, 'msgs': msgs,
                      'working': 0 < len(msgs) < total, 'done': len(msgs) >= total})
-    return {'bots': bots}
+    return {'bots': bots, 'dm': dm_files()}
 
 def _env():
     env = dict(os.environ)
