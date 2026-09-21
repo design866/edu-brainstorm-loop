@@ -2,6 +2,13 @@
 
 本技能遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 规范，版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [2.4.0] - 2026-09-21
+
+### 📊 进度回报机制（用户 2026-09 反馈修复）
+- **progress-watch.py**：课堂制作时自动轮询（每分钟），每节完成自动汇报进度（场景 x/y · 音频 n 条）
+- 修复"制作中无人汇报"问题——进度回报·制作不停真正落地
+- 配合 bridge /confirm 直达吴老师 + deliver-quality 质检环
+
 ## [2.3.0] - 2026-09-19
 
 ### 🌍 适用范围扩展（用户 2026-09 定）
