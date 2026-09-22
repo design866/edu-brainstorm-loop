@@ -134,6 +134,7 @@ C:/Python314/python "<技能目录>/gen-panel.py" "<教育问题>"
 ## 模型约定（用户 2026-09 定，v4.1 升级）
 
 - **机器人讨论统一用 `deepseek-v4.1-flash`**（火山方舟 custom:huoshan）——最新版 + 最快
+  - **额度策略（用户 2026-09 定）**：先用 V4.1 免费 tokens（50 万赠送），**免费额度耗尽后自动继续用 V4.1 Flash（走 Agent Plan 正常配额），不回退 v4-flash**——5 机器人保持 v4.1-flash 不变，无需切换
   - 方舟实际路由：`deepseek-v4.1-flash` → 响应模型 `deepseek-v4-1-flash`（实测 1.5s）
   - 对比：deepseek-v4-flash 2.7s / kimi-k3 4.6s（完整调用 35s 更慢）/ doubao-seed-2-1 41s ❌
   - 5 个机器人 config.yaml 均已配置 `model.default: deepseek-v4.1-flash / provider: custom:huoshan`
