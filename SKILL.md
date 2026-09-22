@@ -1,11 +1,11 @@
 ---
 name: edu-brainstorm-loop
 description: "Use when 任何教育问题（课题/教学/应用/活动/评价）：5 专家闭环讨论后可视化交付，OpenMAIC 执行。"
-version: 2.5.0
+version: 2.6.0
 platforms: [windows]
 ---
 
-# 教育头脑风暴闭环 v2.5（触发 → 闭环 → 可视化 → 修改 → 统筹 → 直产交付 + 质检环 + 进度回报）
+# 教育头脑风暴闭环 v2.6（触发 → 闭环 → 可视化 → 修改 → 统筹 → 直产交付 + 质检环 + 进度回报 + 群公告）
 
 用户确认的**标准工作方式**（2026-09）：**凡是教育问题**（课题规划、教学设计、学习应用、活动方案、评价体系、题型创意…）**一律自动触发本流程**，不再单发单答。
 
@@ -145,6 +145,16 @@ C:/Python314/python "<技能目录>/gen-panel.py" "<教育问题>"
   - Hermes config.yaml custom_providers.huoshan.models 已注册 `deepseek-v4.1-flash`
 - **opencode-free 已不可用**（2026-09 OpenCode 停止匿名免费通道，relay 403）——不作为备选
 - 20-25s/次调用 = deepseek 推理思考时间（reasoning 特性），非故障；会话已用任务独立会话防膨胀
+
+## 机器人运维（2026-09 汇总·用户反馈修复）
+
+- **会话膨胀是变慢主因**：机器人共用 Bot Chat 会累积上百条消息（243 条 → 每次调用带 170-198KB 历史 → 20-35s 慢）。已修复：
+  - 脚本改用**任务独立会话** `Task-时间戳`（brainstorm-session.sh 已改）
+  - **会话清理**：任务前清机器人旧会话（`rm profiles/<bot>/sessions/*.json`）
+  - 清后实测：edu-planner 23.8s（旧 29.9s，且不再越用越慢）
+- **SESSION_NOT_OWNED**：机器人 Bot Chat 被旧 cli 进程持有 → 报错拒绝。处理：杀遗留 `edu-* chat` 进程释放 lease（`Stop-Process` 匹配 CommandLine 含 edu- 和 chat 的 python）。
+- **面板公告进群**：面板生成后 panel-watcher 自动调 bridge `/announce` → 吴老师在群聊发布公告（留档+全员可见）。修改意见 `/revise` → 点子哥+苏博士在各自 Bot Chat 讨论（群聊汇总显示）。
+- **清理脚本**：`bash scripts/cleanup.sh`（清 5 机器人旧会话 + 确认三服务）——或手动 `rm profiles/<bot>/sessions/*.json`。
 
 ## 模型配额陷阱（2026-09 实测）
 

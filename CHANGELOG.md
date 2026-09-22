@@ -2,6 +2,14 @@
 
 本技能遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 规范，版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [2.6.0] - 2026-09-22
+
+### 🤖 机器人问题修复汇总（用户反馈驱动）
+- **会话膨胀修复**：任务独立会话替代共用 Bot Chat；任务前清旧会话；修复 SESSION_NOT_OWNED（杀遗留进程）
+- **面板公告进群**：面板生成 → /announce → 吴老师群聊发布公告（留档+全员可见）
+- **修改意见群里讨论**：/revise → 点子哥+苏博士各自 Bot Chat（群聊汇总显示）
+- **清理脚本** cleanup.sh（清 5 机器人旧会话 + 确认三服务）
+
 ## [2.5.0] - 2026-09-21
 
 ### 🔧 开工前服务启动（用户 2026-09 硬性要求）
