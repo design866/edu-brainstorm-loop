@@ -133,6 +133,8 @@ C:/Python314/python "<技能目录>/gen-panel.py" "<教育问题>"
 
 **面板自动弹出守护（panel-watcher.py）**：随 start-services.sh 启动，每 30 秒监控 `round4-final.txt`——闭环完成（内容 ≥100 字）自动运行 gen-panel.py 生成并弹出面板，**全程无需人工/agent 记性**。
 
+**面板公告进群（用户 2026-09 定）**：面板生成后，panel-watcher 自动调 bridge `/announce` → 吴老师在群聊（Bot Chat，群成员可见）**发布面板公告**（主题 + 文件路径 + 查看方式）→ 每次面板都在群里有记录、全员可见。修改意见触发 `/revise` → 点子哥+苏博士在各自 Bot Chat 讨论（群聊汇总显示）。
+
 ## 模型约定（用户 2026-09 定，v4.1 升级）
 
 - **机器人讨论统一用 `deepseek-v4.1-flash`**（火山方舟 custom:huoshan）——最新版 + 最快

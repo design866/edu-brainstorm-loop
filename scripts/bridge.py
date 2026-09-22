@@ -100,6 +100,30 @@ def dispatch_revise(mod_text):
     threading.Thread(target=run, daemon=True).start()
     return job
 
+def dispatch_announce(panel_path, topic):
+    """面板生成后，让 edu-reviewer 在群聊(Bot Chat) announce 面板链接，全员可见留档"""
+    job = {'time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+           'panel': panel_path[:120], 'status': 'announced'}
+    _log(job)
+
+    def run():
+        try:
+            q = ('【群公告】📊 可视化方案面板已生成，请向全组通报（供留档和全员查看）：'
+                 '主题：' + topic[:60] +
+                 ' · 面板文件：' + panel_path[:100] +
+                 ' · 可在桥接工作台 http://127.0.0.1:8790 或桌面打开查看。'
+                 '请在群聊里正式发布这条公告。')
+            subprocess.Popen(
+                [HERMES, '-p', 'edu-reviewer', 'chat', '--in', os.path.expanduser('~'),
+                 '-c', 'Bot Chat', '--create-if-missing', '-Q', '-q', q],
+                env=_env(), stdout=open(os.path.join(W, 'announce-panel.txt'), 'w', encoding='utf-8'),
+                stderr=subprocess.STDOUT, creationflags=subprocess.CREATE_NO_WINDOW)
+        except Exception as e:
+            io.open(os.path.join(W, 'announce-panel.txt'), 'a', encoding='utf-8').write('\nERR: ' + str(e))
+    threading.Thread(target=run, daemon=True).start()
+    return job
+
+
 def dispatch_reviewer(requirement):
     job = {'time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
            'requirement': requirement[:200], 'status': 'dispatched'}
@@ -152,7 +176,10 @@ class H(BaseHTTPRequestHandler):
                 body = json.loads(self.rfile.read(length).decode('utf-8'))
             except Exception:
                 body = {}
-        if p == '/revise':
+        if p == '/announce':
+            job = dispatch_announce(body.get('panel', '面板已生成'), body.get('topic', '教育课题'))
+            out = {'ok': True, 'message': '已通知吴老师在群聊发布面板公告', 'job': job}
+        elif p == '/revise':
             job = dispatch_revise(body.get('mod', '请优化方案'))
             out = {'ok': True, 'message': '已通知点子哥+苏博士按修改意见开始新一轮讨论', 'job': job}
         elif p == '/confirm':

@@ -52,6 +52,16 @@ def check_and_poppanel():
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         io.open(MARKER, 'w', encoding='utf-8').write(str(size))
         print('  已触发面板生成: ' + out)
+        # 通知桥接 → 吴老师在群聊发布面板公告（全员可见留档）
+        import json as _json, urllib.request as _ur
+        try:
+            payload = _json.dumps({'panel': out, 'topic': topic}).encode()
+            req = _ur.Request('http://127.0.0.1:8790/announce', data=payload,
+                              headers={'Content-Type': 'application/json'}, method='POST')
+            _ur.urlopen(req, timeout=10)
+            print('  已通知吴老师群聊发布面板公告')
+        except Exception as e:
+            print('  公告通知失败(桥接未运行?): ' + str(e))
     except Exception as e:
         print('  生成失败: ' + str(e))
 
