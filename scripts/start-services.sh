@@ -56,9 +56,23 @@ else
   echo "  ⚠️ progress-watch.py 未找到"
 fi
 
+# ---- 4. 面板自动弹出守护 ----
+echo ""
+echo "[4/4] 面板自动弹出守护..."
+WATCHER="C:/Users/Gilbert/AppData/Local/hermes/skills/edu/edu-brainstorm-loop/panel-watcher.py"
+if [ -f "$WATCHER" ]; then
+  if powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { \$_.CommandLine -like '*panel-watcher*' } | Measure-Object | Select-Object -ExpandProperty Count" 2>/dev/null | grep -q "^[1-9]"; then
+    echo "  ✓ 面板守护已在运行"
+  else
+    powershell -NoProfile -Command "Start-Process -WindowStyle Hidden -FilePath 'C:\Python314\python.exe' -ArgumentList 'C:\Users\Gilbert\AppData\Local\hermes\skills\edu\edu-brainstorm-loop\panel-watcher.py'"
+    echo "  ✓ 面板守护已启动（闭环完成自动弹可视化面板）"
+  fi
+fi
+
 echo ""
 echo "==============================================="
 echo " ✅ 服务就绪，可以开工！"
 echo "  工作台:  http://127.0.0.1:8790"
 echo "  OpenMAIC: http://localhost:3000"
+echo "  面板守护: 闭环完成自动弹出可视化方案面板"
 echo "==============================================="
