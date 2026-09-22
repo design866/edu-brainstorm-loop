@@ -1,11 +1,11 @@
 ---
 name: edu-brainstorm-loop
 description: "Use when 任何教育问题（课题/教学/应用/活动/评价）：5 专家闭环讨论后可视化交付，OpenMAIC 执行。"
-version: 2.2.0
+version: 2.5.0
 platforms: [windows]
 ---
 
-# 教育头脑风暴闭环 v2.2（触发 → 闭环 → 可视化 → 修改 → 统筹 → 直产交付 + 进度回报不阻塞）
+# 教育头脑风暴闭环 v2.5（触发 → 闭环 → 可视化 → 修改 → 统筹 → 直产交付 + 质检环 + 进度回报）
 
 用户确认的**标准工作方式**（2026-09）：**凡是教育问题**（课题规划、教学设计、学习应用、活动方案、评价体系、题型创意…）**一律自动触发本流程**，不再单发单答。
 
@@ -141,8 +141,9 @@ C:/Python314/python "<技能目录>/gen-panel.py" "<教育问题>"
 
 ## 模型配额陷阱（2026-09 实测）
 
-- **火山方舟 Agent Plan 月配额有限**：多轮讨论会耗尽（429 "monthly usage quota, reset 09-24"）。跑前探测，429 换 opencode-free（nemotron-3-ultra-free / ling-3.0-flash-fin-free 实测可用）或等重置。
-- GLM 周额度（zai）会耗尽；DeepSeek 官网曾 402 余额不足。
+- **火山方舟 Agent Plan 月配额有限**：多轮讨论会耗尽（429 "monthly usage quota, reset 09-24"）。跑前探测（一次最小调用），429 则**等重置**或换可用 provider（GLM zai 周额度、DeepSeek 官网按量）。
+- **opencode-free 已不可用**（2026-09 OpenCode 停止匿名免费通道，relay 403）——429 时不再尝试它。
+- GLM 周额度（zai）会耗尽（1310 错误，周重置）；DeepSeek 官网曾 402 余额不足。
 - 一次闭环 ≈ 8 次 LLM 调用；修改循环再加。
 
 ## 交付格式
