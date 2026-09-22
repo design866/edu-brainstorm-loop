@@ -131,6 +131,14 @@ C:/Python314/python "<技能目录>/gen-panel.py" "<教育问题>"
 
 `gen-panel.py` 自动读取 `%LOCALAPPDATA%\Temp\brainstorm\round*.txt` → 生成可视化 HTML 方案面板（5 机器人消息流 + 修改对话框）→ 在浏览器新标签页打开。生成器已随技能发布（scripts/gen-panel.py），安装后即可复用。
 
+## 模型约定（用户 2026-09 定）
+
+- **机器人讨论统一用 `deepseek-v4-flash`**（火山方舟 custom:huoshan）——实测最快
+  - 裸测对比：deepseek-v4-flash 2.7s ✅ / kimi-k3 4.6s（完整调用 35s 更慢）/ doubao-seed-2-1 41s ❌
+  - 5 个机器人 config.yaml 均已配置 `model.default: deepseek-v4-flash / provider: custom:huoshan`
+- **opencode-free 已不可用**（2026-09 OpenCode 停止匿名免费通道，relay 403）——不作为备选
+- 20-25s/次调用 = deepseek 推理思考时间（reasoning 特性），非故障；会话已用任务独立会话防膨胀
+
 ## 模型配额陷阱（2026-09 实测）
 
 - **火山方舟 Agent Plan 月配额有限**：多轮讨论会耗尽（429 "monthly usage quota, reset 09-24"）。跑前探测，429 换 opencode-free（nemotron-3-ultra-free / ling-3.0-flash-fin-free 实测可用）或等重置。
