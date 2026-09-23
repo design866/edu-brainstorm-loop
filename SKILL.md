@@ -115,6 +115,7 @@ setup.sh 自动完成：
 ## 群聊公开机制（用户 2026-09 硬性要求）
 
 - **机器人不能单独发表**：所有机器人发言/产出/进度必须**在群聊公开实时显示**，用户全程可见
+- **发言必须走 Bot Chat 会话**：机器人用 `-c "Bot Chat"`（群聊成员可见），**不得用任务独立会话**（Task-时间戳会导致群聊看不到发言——用户 2026-09 纠正）。会话膨胀改用定期清理（cleanup.sh），不脱离 Bot Chat
 - **群聊视图**：桥接工作台（8790）按**时间线**汇总 5 位专家所有发言（头像+名字+轮次+时间戳），每 4 秒刷新，像微信群
 - **时间线来源**：bridge `/api` 读取 `%LOCALAPPDATA%\Temp\brainstorm\*.txt`（round/task/revise/qa 等），按修改时间合并排序
 - **产出文件**：机器人写入的方案文件（hermes-dm）同步在群聊下方展示
@@ -162,7 +163,7 @@ C:/Python314/python "<技能目录>/gen-panel.py" "<教育问题>"
   - 5 个机器人 config.yaml 均已配置 `model.default: deepseek-v4.1-flash / provider: custom:huoshan`
   - Hermes config.yaml custom_providers.huoshan.models 已注册 `deepseek-v4.1-flash`
 - **opencode-free 已不可用**（2026-09 OpenCode 停止匿名免费通道，relay 403）——不作为备选
-- 20-25s/次调用 = deepseek 推理思考时间（reasoning 特性），非故障；会话已用任务独立会话防膨胀
+- 20-25s/次调用 = deepseek 推理思考时间（reasoning 特性），非故障；会话膨胀用 cleanup.sh 定期清理（不脱离 Bot Chat，保证群聊可见）
 
 ## 机器人运维（2026-09 汇总·用户反馈修复）
 
