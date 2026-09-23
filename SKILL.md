@@ -57,10 +57,12 @@ setup.sh 自动完成：
      · 用户消息必须经群里转达，机器人不在群外单独开工
    ↓
 ①′ 开工前启动服务（用户 2026-09 硬性要求）── 有任务必须先把所需服务启动/确认就绪再干活：
-     · 桥接工作台 (8790)  ── bash scripts/start-services.sh
-     · OpenMAIC (3000)    ── 同上（start-services.sh 自动启）
-     · 制作进度轮询       ── 同上
-     · 未就绪不开工：先跑 `bash scripts/start-services.sh` 确认三服务 OK
+     · **必须用 `bash scripts/start-services.sh` 一次性启动全部**（用户 2026-09 踩坑：手动只启 OpenMAIC 漏了桥接 8790 → 面板确认无法自动直达机器人）
+     · 桥接工作台 (8790)  ── start-services.sh 自动
+     · OpenMAIC (3000)    ── start-services.sh 自动
+     · 制作进度轮询       ── start-services.sh 自动
+     · 面板自动弹出守护   ── start-services.sh 自动
+     · 未就绪不开工：start-services.sh 后逐项确认 8790/3000/守护 OK
    ↓
 ② 闭环讨论 ── 轮0 小组发散 → 轮2 三师评审 → 轮3 小组迭代 → 轮4 吴老师终审
    ↓
