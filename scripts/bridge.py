@@ -52,16 +52,26 @@ def dm_files():
 
 def status():
     bots = []
+    timeline = []
     for prof, em, name, role, rounds in BOTS:
         msgs = []
         for f, label in rounds:
             t = readf(f)
             if t:
                 msgs.append({'round': label, 'text': t})
+                # 群聊时间线：带发言人+时间戳+轮次
+                fp = os.path.join(W, f + '.txt')
+                mtime = os.path.getmtime(fp) if os.path.exists(fp) else 0
+                timeline.append({'em': em, 'name': name, 'role': role,
+                                 'round': label, 'text': t,
+                                 'time': datetime.datetime.fromtimestamp(mtime).strftime('%H:%M:%S'),
+                                 'ts': mtime})
         total = len(rounds)
         bots.append({'em': em, 'name': name, 'role': role, 'msgs': msgs,
                      'working': 0 < len(msgs) < total, 'done': len(msgs) >= total})
-    return {'bots': bots, 'dm': dm_files()}
+    # 时间线按时间排序（新→旧）
+    timeline.sort(key=lambda x: x['ts'], reverse=True)
+    return {'bots': bots, 'timeline': timeline[:60], 'dm': dm_files()}
 
 def _env():
     env = dict(os.environ)

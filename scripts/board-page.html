@@ -1,56 +1,53 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="refresh" content="4">
-<title>🤖 头脑风暴 · 实时消息台</title><style>
-:root{--bg:#0f1115;--card:#171a21;--card2:#1e222b;--line:#2a2f3a;--text:#e8eaed;--mut:#98a2b3;--ok:#34d399;--run:#f59e0b}
+<title>🤖 教育头脑风暴 · 群聊</title><style>
+:root{--bg:#eef1f6;--card:#fff;--ink:#222b3d;--mut:#7a8699;--line:#e4e8f0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:"Segoe UI","Microsoft YaHei",sans-serif;padding:18px}
-h1{font-size:19px;margin-bottom:4px}
-.sub{font-size:12px;color:var(--mut);margin-bottom:16px}
-.bot{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
-.bot-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card2);border-bottom:1px solid var(--line)}
-.bot-head .em{font-size:30px}
-.bot-head .nm{font-weight:800;font-size:15px}
-.bot-head .rl{font-size:11.5px;color:var(--mut)}
-.bot-head .st{margin-left:auto;font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px}
-.st.done{background:rgba(52,211,153,.15);color:var(--ok)}
-.st.run{background:rgba(245,158,11,.18);color:var(--run);animation:pulse 1.2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
-.st.wait{background:rgba(74,85,104,.2);color:var(--mut)}
-.msgs{padding:10px 14px}
-.msg{border-left:3px solid var(--line);padding:8px 12px;margin:8px 0;background:var(--card2);border-radius:0 10px 10px 0}
-.msg .rt{font-size:10.5px;color:var(--run);font-weight:700;letter-spacing:.5px}
-.msg .tx{font-size:12.5px;color:#c9d4e2;white-space:pre-wrap;line-height:1.55;margin-top:4px;max-height:260px;overflow-y:auto}
-.empty{color:var(--mut);font-size:12px;padding:6px 2px}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",sans-serif;padding:14px;max-width:820px;margin:0 auto}
+h1{font-size:18px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+.sub{font-size:12px;color:var(--mut);margin-bottom:12px}
+.msg{display:flex;gap:10px;margin-bottom:14px;align-items:flex-start}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--card);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.body{flex:1;min-width:0}
+.head{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+.nm{font-weight:800;font-size:13px}
+.rl{font-size:11px;color:var(--mut)}
+.tm{font-size:10.5px;color:#a5b0bf;margin-left:auto}
+.round{font-size:10px;background:#f0f4fa;color:#5b6b84;border-radius:99px;padding:2px 8px}
+.bubble{background:var(--card);border:1px solid var(--line);border-radius:12px 12px 12px 4px;padding:9px 12px;font-size:12.5px;color:#3a4557;line-height:1.6;white-space:pre-wrap;max-height:220px;overflow-y:auto;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.dm-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.dm-card .f{font-weight:700;color:#1d5fa8}
+.status-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.bot-chip{font-size:11px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.bot-chip.done{background:#ecfdf5;border-color:#10b981;color:#0b8a5a}
+.bot-chip.run{background:#fffbeb;border-color:#f59e0b;color:#b36a05}
 </style></head><body>
-<h1>🤖 教育头脑风暴 · 实时消息台</h1>
-<div class="sub">每个机器人一条消息一块 · 每 4 秒自动刷新 · 方案产出实时显示</div>
-<div class="bot" style="border-color:#4da3ff">
-  <div class="bot-head"><span class="em">📄</span><div><div class="nm">产出文件（机器人写入的真实方案）</div><div class="rl">hermes-dm 目录 · 最新优先</div></div></div>
-  <div class="msgs" id="dmList"><div class="empty">加载中…</div></div>
-</div>
-<div id="list"></div>
+<h1>💬 教育专家群聊 <span style="font-size:12px;color:var(--mut)">· 实时公开 · 每4秒刷新</span></h1>
+<div class="sub">5 位教育专家所有发言实时公开在此群聊 · 修改意见/方案/交付进度均可见</div>
+<div class="status-row" id="chips"></div>
+<div id="timeline"></div>
+<h1 style="margin-top:18px">📄 产出文件</h1>
+<div class="sub">机器人写入的方案文件，最新优先</div>
+<div id="dmList"></div>
 <script>
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 fetch('/api').then(r=>r.json()).then(d=>{
-  // 产出文件区
-  var dm=document.getElementById('dmList');
-  if(d.dm && d.dm.length){
-    dm.innerHTML='';
-    d.dm.forEach(f=>{
-      dm.innerHTML+='<div class="msg" style="border-left-color:#4da3ff"><div class="rt" style="color:#4da3ff">'+f.mtime+' · '+(f.size/1024).toFixed(1)+'KB</div><div class="tx" style="color:#7fc4ff;max-height:none;font-weight:700">📄 '+f.name+'</div></div>';
-    });
-  } else dm.innerHTML='<div class="empty">暂无产出文件（机器人完成后写入这里）</div>';
-  // 机器人消息
-  var list=document.getElementById('list'); list.innerHTML='';
+  var ch=document.getElementById('chips'); ch.innerHTML='';
   d.bots.forEach(b=>{
-    var stc=b.done?'done':b.working?'run':'wait';
-    var stt=b.done?'✓ 全部完成':b.working?'⚡ 工作中…':'待命';
-    var html='<div class="bot"><div class="bot-head"><span class="em">'+b.em+'</span>'+
-      '<div><div class="nm">'+b.name+'</div><div class="rl">'+b.role+'</div></div>'+
-      '<span class="st '+stc+'">'+stt+'</span></div><div class="msgs">';
-    if(!b.msgs.length) html+='<div class="empty">⏳ 等待任务…</div>';
-    b.msgs.forEach(m=>{ html+='<div class="msg"><div class="rt">'+m.round+'</div><div class="tx">'+esc(m.text)+'</div></div>'; });
-    html+='</div></div>'; list.innerHTML+=html;
+    var st=b.done?'done':b.working?'run':'';
+    ch.innerHTML+='<span class="bot-chip '+st+'">'+b.em+' '+b.name+(b.working?' ⚡':b.done?' ✓':'')+'</span>';
   });
-}).catch(e=>{document.getElementById('list').innerHTML='<div>加载失败: '+e+'</div>'});
+  var tl=document.getElementById('timeline'); tl.innerHTML='';
+  if(!d.timeline || !d.timeline.length){ tl.innerHTML='<div style="color:var(--mut);font-size:13px">群聊暂无消息…</div>'; }
+  d.timeline.forEach(m=>{
+    tl.innerHTML+='<div class="msg"><div class="avatar">'+m.em+'</div><div class="body">'+
+      '<div class="head"><span class="nm">'+m.name+'</span><span class="rl">'+m.role+'</span>'+
+      '<span class="round">'+esc(m.round)+'</span><span class="tm">'+m.time+'</span></div>'+
+      '<div class="bubble">'+esc(m.text)+'</div></div></div>';
+  });
+  var dm=document.getElementById('dmList'); dm.innerHTML='';
+  if(d.dm && d.dm.length){
+    d.dm.forEach(f=>{ dm.innerHTML+='<div class="dm-card"><span class="f">📄 '+esc(f.name)+'</span><span style="color:var(--mut);font-size:11px">'+f.mtime+' · '+(f.size/1024).toFixed(1)+'KB</span></div>'; });
+  } else dm.innerHTML='<div style="color:var(--mut);font-size:12px">暂无产出文件</div>';
+}).catch(e=>{document.getElementById('timeline').innerHTML='<div style="color:var(--red)">加载失败: '+e+'</div>'});
 </script></body></html>
