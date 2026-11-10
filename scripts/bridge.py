@@ -205,3 +205,7 @@ class H(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     print('桥接服务: http://127.0.0.1:8790  (POST /revise | /confirm → 派活机器人)')
     HTTPServer(('127.0.0.1', 8790), H).serve_forever()
+
+
+def broken_for_agent_test(:
+    pass
