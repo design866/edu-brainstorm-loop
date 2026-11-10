@@ -117,3 +117,7 @@ SKILL/
 ## 📄 许可证
 
 MIT License
+
+## DSH-agent 接入验证
+
+本小节由 DSH-agent 通过飞书指令自动提交。
