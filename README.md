@@ -121,3 +121,5 @@ MIT License
 ## DSH-agent 接入验证
 
 本小节由 DSH-agent 通过飞书指令自动提交。
+
+GitHub @ 触发验证：这条由 agent 响应本 issue 自动提交。
